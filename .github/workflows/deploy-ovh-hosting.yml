@@ -1,25 +1,16 @@
-name: Debug secrets presence
-  run: |
-    test -n "${{ secrets.OVH_HOST }}" && echo "OVH_HOST OK"
-    test -n "${{ secrets.OVH_USER }}" && echo "OVH_USER OK"
-    test -n "${{ secrets.OVH_PORT }}" && echo "OVH_PORT OK"
-    test -n "${{ secrets.OVH_SSH_KEY }}" && echo "OVH_SSH_KEY OK"
-
-name: Deploy to OVH Hosting (main only)
-
-on:
-  push:
-    branches: ["main"]
-
-concurrency:
-  group: deploy-ovh-hosting
-  cancel-in-progress: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug secrets presence
+        shell: bash
+        run: |
+          test -n "${{ secrets.OVH_HOST }}" && echo "OVH_HOST OK" || echo "OVH_HOST MISSING"
+          test -n "${{ secrets.OVH_USER }}" && echo "OVH_USER OK" || echo "OVH_USER MISSING"
+          test -n "${{ secrets.OVH_PORT }}" && echo "OVH_PORT OK" || echo "OVH_PORT MISSING"
+          test -n "${{ secrets.OVH_SSH_KEY }}" && echo "OVH_SSH_KEY OK" || echo "OVH_SSH_KEY MISSING"
 
       - name: Deploy via rsync over SSH
         uses: easingthemes/ssh-deploy@v5.0.0
