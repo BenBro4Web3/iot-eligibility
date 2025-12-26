@@ -1,4 +1,37 @@
-OVH_HOST OK
-OVH_USER OK
-OVH_PORT OK
-OVH_SSH_KEY OK
+name: Deploy to OVH Hosting (main only)
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ovh-hosting
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Debug (optionnel) : vérifie juste la présence des secrets
+      - name: Debug secrets presence
+        shell: bash
+        run: |
+          test -n "${{ secrets.OVH_HOST }}" && echo "OVH_HOST OK" || echo "OVH_HOST MISSING"
+          test -n "${{ secrets.OVH_USER }}" && echo "OVH_USER OK" || echo "OVH_USER MISSING"
+          test -n "${{ secrets.OVH_PORT }}" && echo "OVH_PORT OK" || echo "OVH_PORT MISSING"
+          test -n "${{ secrets.OVH_SSH_KEY }}" && echo "OVH_SSH_KEY OK" || echo "OVH_SSH_KEY MISSING"
+
+      - name: Deploy via rsync over SSH
+        uses: easingthemes/ssh-deploy@v5.0.0
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.OVH_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.OVH_HOST }}
+          REMOTE_USER: ${{ secrets.OVH_USER }}
+          REMOTE_PORT: ${{ secrets.OVH_PORT }}
+          TARGET: /home/agenccs/agenccs/iot-eligibility
+          SOURCE: "./"
+          ARGS: "-rlgoDzvc --delete"
+          EXCLUDE: "/.git/,/.github/"
