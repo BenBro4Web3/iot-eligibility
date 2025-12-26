@@ -1,4 +1,4 @@
-- name: Debug secrets presence
+name: Debug secrets presence
   run: |
     test -n "${{ secrets.OVH_HOST }}" && echo "OVH_HOST OK"
     test -n "${{ secrets.OVH_USER }}" && echo "OVH_USER OK"
