@@ -1,0 +1,27 @@
+name: Deploy to OVH Hosting (main only)
+
+on:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: deploy-ovh-hosting
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via rsync over SSH
+        uses: easingthemes/ssh-deploy@v5.0.0
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.OVH_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.OVH_HOST }}
+          REMOTE_USER: ${{ secrets.OVH_USER }}
+          REMOTE_PORT: ${{ secrets.OVH_PORT }}
+          TARGET: /home/agenccs/agenccs/iot-eligibility
+          SOURCE: "./"
+          ARGS: "-rlgoDzvc --delete"
+          EXCLUDE: "/.git/,/.github/"
