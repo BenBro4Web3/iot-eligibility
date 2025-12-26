@@ -1,3 +1,10 @@
+- name: Debug secrets presence
+  run: |
+    test -n "${{ secrets.OVH_HOST }}" && echo "OVH_HOST OK"
+    test -n "${{ secrets.OVH_USER }}" && echo "OVH_USER OK"
+    test -n "${{ secrets.OVH_PORT }}" && echo "OVH_PORT OK"
+    test -n "${{ secrets.OVH_SSH_KEY }}" && echo "OVH_SSH_KEY OK"
+
 name: Deploy to OVH Hosting (main only)
 
 on:
